@@ -1,6 +1,7 @@
 package de.trautwig.web.crawler.link;
 
 import de.trautwig.web.crawler.content.Content;
+import de.trautwig.web.crawler.content.CssContent;
 import de.trautwig.web.crawler.content.HtmlContent;
 import de.trautwig.web.crawler.content.SitemapContent;
 import de.trautwig.web.crawler.http.Request;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 @Component
 public class LinkExtractor {
 
-    private List<Content> contents = Arrays.asList(new HtmlContent(), new SitemapContent());
+    private List<Content> contents = Arrays.asList(new HtmlContent(), new SitemapContent(), new CssContent());
 
     /** for these extensions we want to use HEAD instead of GET */
     private Set<String> noDownloadExtensions = new HashSet<>(Arrays.asList(

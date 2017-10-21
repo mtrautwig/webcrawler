@@ -17,8 +17,9 @@ turns them into new requests. Certain files are downloaded (GET), others are
 only tested (HEAD) for existence. 
 
 Currently supported content:
-* **HTML pages**. Any link found in a ``src`` or ``href`` attribute is 
-  followed.
+* **HTML pages**. Any link found in a ``src`` or ``href`` attribute or in a 
+  CSS Stylesheet or inline styles is followed.
 * **Sitemap XML files** containing links to all public pages.
+* **CSS files** containing @import or image urls.
 
  

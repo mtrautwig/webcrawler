@@ -1,0 +1,10 @@
+@import 'import.css';
+@import url('url-import.css');
+
+div.logo {
+    background-image: url('logo.png');
+}
+
+ul {
+  list-style: square url(http://www.example.com/redball.png);
+}

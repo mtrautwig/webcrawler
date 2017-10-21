@@ -19,15 +19,36 @@ public class HtmlContent extends Content {
                 return Stream.empty();
             }
 
-            String charset = response.getContentType().getParameter("charset");
+            String charset = response.getEncoding();
             Document doc = Jsoup.parse(in, charset, response.getUrl().toString());
 
-            return Stream.concat(
-                    doc.select("*[href]").stream()
-                            .map(el -> el.attr("href")),
-                    doc.select("*[src]").stream()
-                            .map(el -> el.attr("src")));
+            Stream.Builder<String> links = Stream.builder();
+            addLinksFromCSS(doc, links);
+            addLinksFromInlineCSS(doc, links);
+            addLinksFromElements(doc, links);
+            return links.build();
         }
     }
 
+    private void addLinksFromCSS(Document doc, Stream.Builder<String> links) {
+        doc.select("style").forEach(style -> {
+            CssParser.fromStylesheet(style.html()).getResult().forEach(links::add);
+        });
+    }
+
+    private void addLinksFromInlineCSS(Document doc, Stream.Builder<String> links) {
+        doc.select("*[style]").forEach(style -> {
+            CssParser.fromInline(style.attr("style")).getResult().forEach(links::add);
+        });
+    }
+
+    private void addLinksFromElements(Document doc, Stream.Builder<String> links) {
+        doc.select("*[href]").stream()
+                .map(el -> el.attr("href"))
+                .forEach(links::add);
+
+        doc.select("*[src]").stream()
+                .map(el -> el.attr("src"))
+                .forEach(links::add);
+    }
 }

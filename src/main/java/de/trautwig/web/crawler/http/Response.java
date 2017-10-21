@@ -75,6 +75,10 @@ public class Response {
         return mimeType;
     }
 
+    public String getEncoding() {
+        return getContentType().getParameter("charset");
+    }
+
     public URL getUrl() {
         return url;
     }
