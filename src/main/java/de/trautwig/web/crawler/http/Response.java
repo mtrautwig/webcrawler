@@ -16,7 +16,9 @@ public class Response {
     private int responseCode;
     private String responseMessage;
     private URL url;
+    private Map<String, List<String>> requestHeaders;
     private Map<String, List<String>> headers;
+    private Map<String, String> attributes = new HashMap<>();
     private byte[] data;
     private Duration timing;
 
@@ -36,6 +38,10 @@ public class Response {
         return responseCode / 100 >= 4;
     }
 
+    public Map<String, List<String>> getRequestHeaders() {
+        return Collections.unmodifiableMap(requestHeaders);
+    }
+
     public Map<String, List<String>> getHeaders() {
         return Collections.unmodifiableMap(headers);
     }
@@ -43,6 +49,10 @@ public class Response {
     public Optional<String> getHeader(String name) {
         return Optional.ofNullable(headers.get(name.toLowerCase(Locale.ENGLISH)))
                 .map(v -> v.isEmpty() ? null : v.get(0));
+    }
+
+    public Map<String, String> getAttributes() {
+        return Collections.unmodifiableMap(attributes);
     }
 
     public String getLocation() {
@@ -120,6 +130,16 @@ public class Response {
             return this;
         }
 
+        public Builder requestHeaders(Map<String, List<String>> headerFields) {
+            response.requestHeaders = new HashMap<>();
+            for (Map.Entry<String, List<String>> header : headerFields.entrySet()) {
+                if (header.getKey() != null) {
+                    response.requestHeaders.put(header.getKey().toLowerCase(Locale.ENGLISH), header.getValue());
+                }
+            }
+            return this;
+        }
+
         public Builder headers(Map<String, List<String>> headerFields) {
             response.headers = new HashMap<>();
             for (Map.Entry<String, List<String>> header : headerFields.entrySet()) {
@@ -127,6 +147,11 @@ public class Response {
                     response.headers.put(header.getKey().toLowerCase(Locale.ENGLISH), header.getValue());
                 }
             }
+            return this;
+        }
+
+        public Builder attribute(String name, String value) {
+            response.attributes.put(name, value);
             return this;
         }
 

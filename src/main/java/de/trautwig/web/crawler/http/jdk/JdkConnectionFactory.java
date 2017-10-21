@@ -1,13 +1,10 @@
-package de.trautwig.web.crawler.http;
-
-import org.springframework.stereotype.Component;
+package de.trautwig.web.crawler.http.jdk;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-@Component
-public class ConnectionFactory {
+public class JdkConnectionFactory {
 
     public HttpURLConnection createRequest(String method, URI uri) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();

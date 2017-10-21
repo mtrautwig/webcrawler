@@ -1,21 +1,27 @@
-package de.trautwig.web.crawler.http;
+package de.trautwig.web.crawler.http.jdk;
 
-import org.springframework.stereotype.Component;
+import de.trautwig.web.crawler.http.Response;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
-@Component
-public class ResponseFactory {
+import static de.trautwig.web.crawler.http.IOUtils.consumeFully;
+
+public class JdkResponseFactory {
 
     public Response createResponse(HttpURLConnection connection, Instant started) throws IOException {
+        Map<String, List<String>> requestHeaders = connection.getRequestProperties();
+
+        connection.connect();
         return new Response.Builder()
                 .responseCode(connection.getResponseCode())
                 .responseMessage(connection.getResponseMessage())
                 .url(connection.getURL())
+                .requestHeaders(requestHeaders)
                 .headers(connection.getHeaderFields())
                 .body(extractEntity(connection))
                 .timing(started)
@@ -27,14 +33,7 @@ public class ResponseFactory {
             if (inputStream == null) {
                 return null;
             }
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[8192];
-            for (int len = 0; len != -1; len = inputStream.read(buffer)) {
-                baos.write(buffer, 0, len);
-                // TODO length limit
-            }
-            return baos.toByteArray();
+            return consumeFully(inputStream);
         }
     }
 

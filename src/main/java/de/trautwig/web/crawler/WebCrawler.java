@@ -3,6 +3,7 @@ package de.trautwig.web.crawler;
 import de.trautwig.web.crawler.http.Client;
 import de.trautwig.web.crawler.http.Request;
 import de.trautwig.web.crawler.http.Response;
+import de.trautwig.web.crawler.http.okhttp.OkHttpClient;
 import de.trautwig.web.crawler.link.LinkExtractor;
 import de.trautwig.web.crawler.link.LinkPolicy;
 import de.trautwig.web.crawler.log.JUnitResponseLogger;
@@ -14,7 +15,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.io.File;
-import java.net.CookieManager;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +64,7 @@ public class WebCrawler implements CommandLineRunner {
                 if (policy.isAllowed(request)) {
                     try {
                         Response response = client.execute(request);
+                        logger.log(request, response);
                         invokeAll(links.toRequests(request, response).stream()
                                 .map(WebCrawler.this::execute).collect(Collectors.toList()));
                     } catch (Exception e) {
@@ -76,12 +77,12 @@ public class WebCrawler implements CommandLineRunner {
 
     @Bean
     ResponseLogger responseLogger() throws Exception {
-        return new JUnitResponseLogger(new File("TEST-crawler.xml"));
+        return new JUnitResponseLogger(new File("target/TEST-crawler.xml"));
     }
 
     @Bean
-    CookieManager cookieManager() {
-        return new CookieManager();
+    Client client() {
+        return new OkHttpClient();
     }
 
     @Bean

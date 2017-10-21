@@ -35,17 +35,9 @@ public class JUnitResponseLogger implements ResponseLogger {
                     writer.writeAttribute("message", String.valueOf(response.getResponseCode())
                             .concat(" ").concat(response.getResponseMessage()));
                 }
+
                 writer.writeStartElement("system-out");
-                writer.writeCData(new StringBuilder()
-                        .append(request.getMethod()).append(" ").append(request.getURI()).append("\n")
-                        .append("Referer: ").append(request.getReferer()).append("\n")
-                        .append("\n")
-                        .append(response.getResponseCode()).append(" ").append(response.getResponseMessage()).append("\n")
-                        .append(formatHeaders(response.getHeaders()))
-                        .append("\n")
-                        .append("Distance: ").append(request.getDistance()).append("\n")
-                        .append("Timing: ").append(response.getTiming().toString()).append("\n")
-                        .toString());
+                writer.writeCData(formatExchange(request, response).toString());
 
                 writer.writeEndElement();
                 writer.writeEndElement();
@@ -86,6 +78,25 @@ public class JUnitResponseLogger implements ResponseLogger {
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
+    }
+
+    String formatExchange(Request request, Response response) {
+        StringBuilder responseStr = new StringBuilder()
+                .append(request.getMethod()).append(" ").append(request.getURI()).append("\n")
+                .append(formatHeaders(response.getRequestHeaders()))
+                .append("\n")
+                .append(response.getResponseCode()).append(" ").append(response.getResponseMessage()).append("\n")
+                .append(formatHeaders(response.getHeaders()))
+                .append("\n")
+                .append("Referer = ").append(request.getReferer()).append("\n")
+                .append("Distance = ").append(request.getDistance()).append("\n")
+                .append("Timing = ").append(response.getTiming().toString()).append("\n");
+
+        for (Map.Entry<String, String> attr : response.getAttributes().entrySet()) {
+            responseStr.append(attr.getKey()).append(" = ").append(attr.getValue());
+        }
+
+        return responseStr.toString();
     }
 
     String formatHeaders(Map<String, List<String>> headers) {
